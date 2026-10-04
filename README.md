@@ -3,11 +3,11 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/banner.svg" alt="Zyvor Device Agent" width="100%">
+  <img src="docs/social/device-agent-hero-dark.jpg" alt="Zyvor Device Agent" width="100%">
 </p>
 
 <p align="center">
-  <a href="https://github.com/zyvorai/device-agent/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/zyvorai/device-agent/ci.yml?branch=main&label=CI&logo=github" alt="CI status"></a>
+  <a href="https://github.com/zyvorai/zyvor-device-agent/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/zyvorai/zyvor-device-agent/ci.yml?branch=main&label=CI&logo=github" alt="CI status"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License: Apache-2.0"></a>
   <img src="https://img.shields.io/badge/rust-1.85%2B-orange?logo=rust" alt="Rust 1.85+">
   <img src="https://img.shields.io/badge/platform-arm64%20%7C%20amd64-informational" alt="Platforms: arm64 | amd64">
