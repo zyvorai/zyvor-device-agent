@@ -6,7 +6,7 @@ hero:
 
 Software qualification covers three **emulator** paths so CI can exercise
 industrial/camera/TPM code without Minewing silicon. Physical HIL remains
-[`evidence/qualification/hardware-checklist.md`](../evidence/qualification/hardware-checklist.md).
+[`evidence/qualification/hardware-checklist.md`](https://github.com/zyvorai/zyvor-device-agent/blob/main/evidence/qualification/hardware-checklist.md).
 
 ## Scripts
 

@@ -36,6 +36,6 @@ make emulator-vcan emulator-swtpm
 make emulator-v4l2   # soft-skip if no v4l2loopback
 ```
 
-Sign [`evidence/qualification/hardware-checklist.md`](../evidence/qualification/hardware-checklist.md)
-via [`scripts/hil/run-minewing-hil.sh`](../scripts/hil/run-minewing-hil.sh)
+Sign [`evidence/qualification/hardware-checklist.md`](https://github.com/zyvorai/zyvor-device-agent/blob/main/evidence/qualification/hardware-checklist.md)
+via [`scripts/hil/run-minewing-hil.sh`](https://github.com/zyvorai/zyvor-device-agent/blob/main/scripts/hil/run-minewing-hil.sh)
 ([HIL.md](HIL.md)) before production claims on a physical SKU.
