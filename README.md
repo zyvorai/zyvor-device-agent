@@ -1,44 +1,82 @@
-<p align="center">
-  <img src="docs/assets/zyvor-mark.svg" alt="Zyvor" width="40" height="40">
-</p>
+<div align="center">
 
-<p align="center">
-  <img src="docs/social/device-agent-hero-dark.jpg" alt="Zyvor Device Agent" width="100%">
-</p>
+<img src="docs/assets/zyvor-mark.svg" alt="Zyvor" width="40" height="40">
 
-<p align="center">
-  <a href="https://github.com/zyvorai/zyvor-device-agent/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/zyvorai/zyvor-device-agent/ci.yml?branch=main&label=CI&logo=github" alt="CI status"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License: Apache-2.0"></a>
-  <img src="https://img.shields.io/badge/rust-1.85%2B-orange?logo=rust" alt="Rust 1.85+">
-  <img src="https://img.shields.io/badge/platform-arm64%20%7C%20amd64-informational" alt="Platforms: arm64 | amd64">
-  <img src="https://img.shields.io/badge/status-v0.2.0%20passport--and--flight--recorder-yellow" alt="Status: v0.2.0 passport and flight recorder">
-</p>
+# Zyvor Device Agent
 
-> Linux hardware edge agent for Zyvor — discover the box, expose physical interfaces, publish to Nodra, expose Fleet-compatible inventory.
+<a href="https://github.com/zyvorai/zyvor-device-agent/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/zyvorai/zyvor-device-agent/ci.yml?branch=main&label=CI&logo=github" alt="CI status"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License: Apache-2.0"></a>
+<img src="https://img.shields.io/badge/rust-1.85%2B-orange?logo=rust" alt="Rust 1.85+">
+<img src="https://img.shields.io/badge/platform-arm64%20%7C%20amd64-informational" alt="Platforms: arm64 | amd64">
+<img src="https://img.shields.io/badge/status-v0.2.0%20passport--and--flight--recorder-yellow" alt="Status: v0.2.0 passport and flight recorder">
 
-## Contents
+[![Book a demo](https://img.shields.io/badge/Book_a_demo-0071e3?style=for-the-badge)](https://zyvor.dev/schedule?utm_source=github&utm_medium=device-agent&utm_campaign=readme_hero)
+[![30-day PoC](https://img.shields.io/badge/30--day_PoC-000000?style=for-the-badge)](https://zyvor.dev/poc?utm_source=github&utm_medium=device-agent&utm_campaign=readme_hero)
+[![Deploy](https://img.shields.io/badge/Deploy_with_.deb,_.rpm_or_OCI-30b0c7?style=for-the-badge)](#quickstart)
 
-- [Why this exists](#why-this-exists)
-- [Is this for you?](#is-this-for-you)
-- [v0.1 scope](#v01-scope)
-- [Quick start](#quick-start)
-- [API](#api)
-- [Documentation: guides, reference, architecture](#documentation)
-- [Product boundary](#product-boundary)
-- [Repository map](#repository-map)
-- [License](#license)
+<img src="docs/social/device-agent-hero-dark.jpg" alt="Zyvor Device Agent" width="100%">
 
-<p align="center">
-  <img src="docs/assets/architecture.svg" alt="Generic reference Linux edge hardware feeds Zyvor Device Agent, which discovers identity, health, GPIO, I2C, SPI, UART, CAN, read-only CAN capture, USB and watchdog state, then hands that off to Nodra for protocol and data-plane work and to Fleet for control-plane/lifecycle. Nodra in turn owns Modbus, J1939, OPC-UA, BLE, serial and LoRaWAN protocol decoding." width="720">
-</p>
+### Discover the box. Report what is real.
 
-## Why this exists
+**Linux hardware edge agent for Zyvor — discover the box, expose physical interfaces, publish to Nodra, expose Fleet-compatible inventory.** A small, single-purpose Rust agent for ARM64 and amd64 gateways, with a local REST API and dashboard. No Kubernetes, no cloud required.
+
+**arm64 first-class** · **Read-only by design** · **Bearer, mTLS or Unix socket** · **Signed .deb / .rpm** · **No cloud required**
+
+</div>
+
+---
+
+## What's new
+
+**v0.2.0 — trusted hardware passport and flight recorder** ([changelog](CHANGELOG.md), [upgrade notes](docs/UPGRADE-0.2.0.md)):
+
+| Area | What shipped |
+|---|---|
+| Device passport | `GET /api/v1/passport`, `agentctl passport` / `verify` |
+| Flight recorder | Segmented flight recorder and `GET /api/v1/recorder`; redacted support bundles (`agentctl support-bundle`) |
+| Signed inventory | Signed Fleet inventory sibling fields (digest, boot id, sequence, signature) |
+| Least privilege | Privilege-separated `bus-helper` over authenticated UDS (`--features privsep`); safe signed remediation catalogue (no shell) |
+| Enrollment | Enrollment renew / revocation check, zero-touch installer flags (`--enrollment-token`) and `agentctl commission` |
+| Field dashboard | Six-screen field-engineer dashboard and first-run wizard; Plugin SDK v2 schema and optional WASI feature |
+| Breaking | Default listen is `127.0.0.1:9188`; non-loopback with `auth.mode = "none"` is refused unless explicitly allowed; no long-lived bearer tokens in `?token=` |
+
+<a id="why-this-exists"></a>
+
+## Why Zyvor Device Agent
 
 Zyvor already has higher layers for workload/runtime control and fleet/data-plane responsibilities. What was missing was a small Linux-native hardware foundation that can run directly on an ARM64 gateway without Kubernetes. Device Agent provides that boundary.
 
 It intentionally does **not** interpret Modbus registers, CAN/J1939 PGNs or OPC-UA nodes. It reports physical capabilities and gives sensor drivers a stable local contract. Nodra owns industrial protocol semantics, routing and offline store-and-forward. Fleet owns remote lifecycle and desired state. Axiom can later consume the node capability model but is not required on the device.
 
-## Is this for you?
+| When this happens… | Device Agent gives you… |
+|---|---|
+| Nobody can say what hardware is actually on a gateway in the field | Cached CPU / RAM / storage / OS / kernel / temperature inventory plus Ethernet, Wi-Fi, CAN, GPIO, I2C, SPI, UART, USB and watchdog discovery, refreshed on change |
+| A CAN bus goes bus-off and you find out from the line operator | Read-only SocketCAN health — controller state, bitrates, error counters — and threshold events on the edge transition |
+| You need raw CAN frames for diagnosis but can't risk transmitting | Disabled-by-default, RX-only capture on an explicit interface allowlist, over REST/SSE |
+| Every vendor's edge runtime wants its own cloud | No cloud required; Nodra MQTT publishing and the Fleet inventory bridge are optional |
+| Someone asks you to prove what a device is and what happened on it | A device passport you can verify, a flight recorder and redacted support bundles |
+| The agent's API on the gateway is an open door | Bearer, mTLS (optionally TPM2-backed) or a Unix socket with peer-credential checks; loopback by default |
+
+![Capabilities at a glance: Discover, Industrial, Trust, Operate](docs/ux/readme-capabilities.jpg)
+
+---
+
+## Zyvor Device Agent vs AWS IoT Greengrass
+
+![Zyvor Device Agent vs AWS IoT Greengrass: a hardware layer, not a cloud runtime](docs/ux/readme-vs.jpg)
+
+| | **Zyvor Device Agent** | **AWS IoT Greengrass** (cloud-connected edge runtime) |
+|---|---|---|
+| Primary job | Hardware inventory, health and bounded bus access | Run and manage edge software components deployed from AWS |
+| Management plane | None required; optional Nodra (MQTT) and Zyvor Fleet | AWS IoT Core and Greengrass deployments in an AWS account |
+| Hardware and bus discovery | Built in: GPIO, I2C, SPI, UART, CAN, USB, watchdog, thermal | Not its focus; built as custom components |
+| CAN | SocketCAN health plus RX-only, allowlisted frame capture | Through custom components |
+| Industrial protocol decoding | Deliberately out of scope — handed to Nodra | Through custom components |
+| Device identity | Device passport, mTLS enrollment, optional TPM2 key | X.509 device certificates registered with AWS IoT |
+| Footprint | One Rust daemon, `.deb` / `.rpm` / multi-arch OCI image, systemd | The Greengrass nucleus plus the components you deploy |
+| **Choose AWS IoT Greengrass when** | | You are standardising on AWS and want to deploy and manage edge application components from the cloud |
+
+### Is this for you?
 
 Device Agent is a small, single-purpose, open-source (Apache-2.0) hardware
 layer for a Linux edge gateway — not a home-automation hub, not a
@@ -73,28 +111,57 @@ support, production-readiness and data-residency questions, and
 [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) covers the issues
 people actually hit.
 
-## v0.1 scope
+---
 
-- ARM64 Linux first-class support
-- CPU / RAM / root storage / OS / kernel / uptime / temperature inventory
-- Ethernet / Wi-Fi / CAN network discovery
-- read-only SocketCAN health: controller state, bitrate/CAN-FD bitrate and error counters
-- passive serial/RS485 awareness from board config + Linux device tree
-- disabled-by-default, RX-only SocketCAN frame capture on an explicit interface allowlist
-- GPIO / I2C / SPI / UART / CAN / USB / watchdog discovery
-- continuous cached inventory refresh + material hardware-change events
-- sensor plugin process API + scheduled sampling
-- real LM75/TMP102 I²C temperature reference plugin (explicit bus/address; no scanning)
-- REST API
-- Prometheus metrics endpoint
-- Nodra MQTT publishing: retained inventory/status, per-sensor and event topics
-- Fleet inventory bridge with hardware metadata and IP addresses
-- systemd service
-- OCI image with `linux/amd64` + `linux/arm64` CI
-- local Apple-inspired dashboard using the same React/Vite family as Axiom
-- Generic reference-board profile + acceptance test
+## How it fits together
 
-## Quick start
+![Device Agent reports the box; Nodra and Fleet do the rest](docs/ux/readme-how-it-works.jpg)
+
+<p align="center">
+  <img src="docs/assets/architecture.svg" alt="Generic reference Linux edge hardware feeds Zyvor Device Agent, which discovers identity, health, GPIO, I2C, SPI, UART, CAN, read-only CAN capture, USB and watchdog state, then hands that off to Nodra for protocol and data-plane work and to Fleet for control-plane/lifecycle. Nodra in turn owns Modbus, J1939, OPC-UA, BLE, serial and LoRaWAN protocol decoding." width="720">
+</p>
+
+### Product boundary
+
+```text
+Device Agent: "There is a CAN interface named can0."
+Nodra:        "0x18FF50E5 is engine temperature = 82°C."
+Fleet:        "Apply config X to device ZY-REF-0001 and restart workload Y."
+Axiom:        "This application requires CAN + 4 cores; this node is eligible."
+```
+
+This separation is a design rule, not just an implementation detail.
+
+### Repository map
+
+```text
+src/                    Rust daemon
+  hardware/             Linux/sysfs discovery only (+ optional hotplug.rs)
+  auth/                 bearer/mTLS auth, enrollment
+  identity/             mTLS private key backends (software, optional tpm)
+  integrations/         Nodra and Fleet adapters
+  api.rs                 REST API
+  plugins.rs             external sensor plugin contract
+  tls.rs                 optional plain-TLS listener (self-signed by default)
+web/dashboard/           React + TypeScript + Vite UX
+config/                  runtime configuration
+packaging/systemd/       Linux service (bare-metal)
+packaging/container/     Linux service (container, Podman-based)
+examples/                plugin examples
+scripts/                 packaging helpers
+docs/                    architecture, roadmap, reference-hardware profile
+docs/guides/             numbered tutorial series (getting started -> production/container)
+docs/assets/             README banner/mark and diagrams
+.github/workflows/       CI and tagged release pipeline
+```
+
+---
+
+<a id="quick-start"></a>
+
+## Quickstart
+
+Requirements: Rust **1.85+**, Linux (arm64 first-class, amd64 for development/CI); Node for the dashboard build. Packages and images below need no on-device build.
 
 ```bash
 cp config/device-agent.example.toml /tmp/device-agent.toml
@@ -122,6 +189,27 @@ npm ci
 npm test
 npm run build
 ```
+
+## v0.1 scope
+
+- ARM64 Linux first-class support
+- CPU / RAM / root storage / OS / kernel / uptime / temperature inventory
+- Ethernet / Wi-Fi / CAN network discovery
+- read-only SocketCAN health: controller state, bitrate/CAN-FD bitrate and error counters
+- passive serial/RS485 awareness from board config + Linux device tree
+- disabled-by-default, RX-only SocketCAN frame capture on an explicit interface allowlist
+- GPIO / I2C / SPI / UART / CAN / USB / watchdog discovery
+- continuous cached inventory refresh + material hardware-change events
+- sensor plugin process API + scheduled sampling
+- real LM75/TMP102 I²C temperature reference plugin (explicit bus/address; no scanning)
+- REST API
+- Prometheus metrics endpoint
+- Nodra MQTT publishing: retained inventory/status, per-sensor and event topics
+- Fleet inventory bridge with hardware metadata and IP addresses
+- systemd service
+- OCI image with `linux/amd64` + `linux/arm64` CI
+- local Apple-inspired dashboard using the same React/Vite family as Axiom
+- Generic reference-board profile + acceptance test
 
 ## API
 
@@ -151,7 +239,6 @@ npm run build
 | `GET /api/v1/events/recent` | bounded recent event history |
 | `GET /api/v1/doctor` | field diagnostics |
 | `GET /metrics` | Prometheus text exposition |
-
 
 ## Industrial bus layer (v0.1.2)
 
@@ -419,45 +506,11 @@ a pure-Rust YUYV→RGB→JPEG software encode (`jpeg-encoder`, no `libjpeg`/`ffm
 `publish_to_nodra` sends only health/presence to Nodra, never frame bytes. See
 [8. Camera streaming](docs/guides/08-camera-streaming.md) and `docs/CAMERA.md`.
 
-## Product boundary
-
-```text
-Device Agent: "There is a CAN interface named can0."
-Nodra:        "0x18FF50E5 is engine temperature = 82°C."
-Fleet:        "Apply config X to device ZY-REF-0001 and restart workload Y."
-Axiom:        "This application requires CAN + 4 cores; this node is eligible."
-```
-
-This separation is a design rule, not just an implementation detail.
-
 ## UX principles
 
 The dashboard is a **local hardware cockpit**. It opens on one screen showing device identity, health, CPU/RAM/temperature, detected physical interfaces, and Nodra/Fleet status. The visual language is intentionally minimal: system typography, white space, glass-like navigation, monochrome surfaces, dark diagnostics, and Zyvor orange used only for emphasis.
 
 Pages: **Overview · Hardware · Interfaces · Industrial · Sensors · Integrations · Diagnostics · Settings**.
-
-## Repository map
-
-```text
-src/                    Rust daemon
-  hardware/             Linux/sysfs discovery only (+ optional hotplug.rs)
-  auth/                 bearer/mTLS auth, enrollment
-  identity/             mTLS private key backends (software, optional tpm)
-  integrations/         Nodra and Fleet adapters
-  api.rs                 REST API
-  plugins.rs             external sensor plugin contract
-  tls.rs                 optional plain-TLS listener (self-signed by default)
-web/dashboard/           React + TypeScript + Vite UX
-config/                  runtime configuration
-packaging/systemd/       Linux service (bare-metal)
-packaging/container/     Linux service (container, Podman-based)
-examples/                plugin examples
-scripts/                 packaging helpers
-docs/                    architecture, roadmap, reference-hardware profile
-docs/guides/             numbered tutorial series (getting started -> production/container)
-docs/assets/             README banner/mark and diagrams
-.github/workflows/       CI and tagged release pipeline
-```
 
 ## First demo acceptance test
 
@@ -510,18 +563,65 @@ A numbered series meant to be read in order the first time through; see
 - [`ROADMAP.md`](docs/ROADMAP.md) / [`BACKLOG.md`](docs/BACKLOG.md) — where this is headed
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) / [`SECURITY.md`](SECURITY.md) / [`CHANGELOG.md`](CHANGELOG.md)
 
+---
+
+## Maturity
+
+Current release: **v0.2.0** ([changelog](CHANGELOG.md)). From the [FAQ](docs/FAQ.md):
+
+> **Is this production-ready?** Status is **v0.1.6 production-hardening** — not
+> GA, and **not** Minewing-silicon-qualified. The Linux agent (packages,
+> auth/TLS, emulator/`hil-ci-emulator`, lab-surrogate) is shippable for
+> hardened installs; physical Minewing HIL remains unsigned
+> (`minewing_claimable=false` on surrogate evidence).
+
+| Surface | Status |
+|---|---|
+| Inventory, health, REST API, dashboard, Prometheus metrics | Core |
+| Nodra publishing, Fleet inventory bridge | Optional integrations, configured per device |
+| CAN frame capture, thresholds, TLS, CORS | Opt-in, disabled by default (rate limiting is on by default) |
+| Hotplug, camera, TPM2 identity, privsep | Opt-in Cargo features (`hotplug`, `camera`, `tpm2`, `privsep`) |
+| Edge AI | Scaffold only: `GET /api/v1/inference/events` returns 501 |
+
+Production and qualification detail: [PRODUCTION.md](docs/PRODUCTION.md) · [HIL.md](docs/HIL.md) · [QUALIFICATION.md](docs/QUALIFICATION.md).
+
+---
+
+## Part of the Zyvor stack
+
+| Product | Role next to Device Agent |
+|---|---|
+| **Zyvor Device Agent** | Hardware inventory, health and bus discovery on the gateway |
+| **[Nodra](https://github.com/zyvorai/nodra)** | Receives retained inventory, status, sensor and CAN topics over MQTT; owns protocol decoding and store-and-forward |
+| **[Fleet](https://github.com/zyvorai/zyvorai-fleet)** | Consumes the Fleet-compatible inventory; owns remote lifecycle and desired state |
+| **[Yard](https://github.com/zyvorai/yard)** | Asset registry; its Device Agent gateway bridges this agent's data into Yard ingest |
+| **[Zyvor OTA](https://github.com/zyvorai/ota)** | Signed device updates; the `minewing-gw1-r1` bring-up profile is aligned with OTA's board profile |
+
+→ [zyvor.dev](https://zyvor.dev)
+
+---
+
 ## License
 
-Commercial subscriptions and support: see [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md).
-
-### Open source (Apache-2.0)
-
-This repository is licensed under the [Apache License, Version 2.0](LICENSE).
+Zyvor Device Agent is **free and open source** under the [Apache License, Version 2.0](LICENSE).
 You may use, modify, and run it for personal, lab, and commercial production
 use at no charge, subject to Apache-2.0 (preserve notices / NOTICE where required).
 See [NOTICE](NOTICE).
 
-### Enterprise
+**Zyvor Enterprise** adds what production teams ask for: supported releases, deployment and upgrade guidance, priority incident triage, a named technical contact and 24x7 critical intake. Production support, SLAs, and Zyvor Enterprise products are licensed separately. Plans and terms: [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md) · [Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=device-agent&utm_campaign=readme_license) · [sales@zyvor.dev](mailto:sales@zyvor.dev).
 
-Production support, SLAs, and Zyvor Enterprise products are licensed separately.
-Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) or see [zyvor.dev](https://zyvor.dev).
+Report vulnerabilities per [SECURITY.md](SECURITY.md). Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+<div align="center">
+
+### Know every gateway down to the bus
+
+[![Book a demo](https://img.shields.io/badge/Book_a_demo-0071e3?style=for-the-badge)](https://zyvor.dev/schedule?utm_source=github&utm_medium=device-agent&utm_campaign=readme_footer)
+[![30-day PoC](https://img.shields.io/badge/Start_a_30--day_PoC-000000?style=for-the-badge)](https://zyvor.dev/poc?utm_source=github&utm_medium=device-agent&utm_campaign=readme_footer)
+[![Pricing](https://img.shields.io/badge/Pricing-1d1d1f?style=for-the-badge)](https://zyvor.dev/pricing?utm_source=github&utm_medium=device-agent&utm_campaign=readme_footer)
+[![Contact sales](https://img.shields.io/badge/Contact_sales-2997ff?style=for-the-badge)](mailto:sales@zyvor.dev?subject=Zyvor%20Device%20Agent)
+[![Star on GitHub](https://img.shields.io/github/stars/zyvorai/zyvor-device-agent?style=for-the-badge&logo=github&label=Star&color=2997ff)](https://github.com/zyvorai/zyvor-device-agent)
+
+</div>
