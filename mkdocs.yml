@@ -1,7 +1,7 @@
 site_name: Zyvor Device Agent
 site_description: Linux hardware edge agent for Zyvor — discover the box, expose physical interfaces, publish to Nodra, expose Fleet-compatible inventory.
-site_url: https://zyvorai.github.io/device-agent/
-repo_url: https://github.com/zyvorai/device-agent
+site_url: https://zyvorai.github.io/zyvor-device-agent/
+repo_url: https://github.com/zyvorai/zyvor-device-agent
 repo_name: zyvorai/device-agent
 edit_uri: edit/main/docs/
 docs_dir: docs
@@ -83,4 +83,4 @@ nav:
       - Backlog: BACKLOG.md
 extra:
   social:
-    - {icon: fontawesome/brands/github, link: https://github.com/zyvorai/device-agent}
+    - {icon: fontawesome/brands/github, link: https://github.com/zyvorai/zyvor-device-agent}
