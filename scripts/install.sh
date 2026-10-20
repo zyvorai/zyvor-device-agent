@@ -57,8 +57,13 @@ import pathlib, re, sys
 url = sys.argv[1]
 path = pathlib.Path("/etc/zyvor/device-agent.toml")
 text = path.read_text()
-text = re.sub(r'(?m)^enabled = false$', "enabled = true", text, count=1)
-text = re.sub(r'(?m)^server_url = ".*"$', f'server_url = "{url}"', text, count=1)
+# Edit only inside the [enrollment] table (other tables also have `enabled = false`).
+m = re.search(r'(?ms)^\[enrollment\]\n.*?(?=^\[|\Z)', text)
+if m:
+    sec = m.group(0)
+    sec = re.sub(r'(?m)^enabled = false$', "enabled = true", sec, count=1)
+    sec = re.sub(r'(?m)^server_url = ".*"$', lambda _: f'server_url = "{url}"', sec, count=1)
+    text = text[:m.start()] + sec + text[m.end():]
 path.write_text(text)
 PY
     fi

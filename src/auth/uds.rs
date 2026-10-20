@@ -100,7 +100,18 @@ pub fn bind(
     }
     // A leftover socket file from a prior crash/unclean stop would otherwise fail bind()
     // with EADDRINUSE; safe to remove since UDS sockets aren't reused across restarts.
-    let _ = std::fs::remove_file(&cfg.path);
+    // Only ever remove an actual socket, never a regular file a misconfigured path points at.
+    if let Ok(meta) = std::fs::symlink_metadata(&cfg.path) {
+        use std::os::unix::fs::FileTypeExt;
+        if meta.file_type().is_socket() {
+            let _ = std::fs::remove_file(&cfg.path);
+        } else {
+            anyhow::bail!(
+                "unix socket path {} exists and is not a socket; refusing to remove it",
+                cfg.path
+            );
+        }
+    }
 
     let listener = UnixListener::bind(&cfg.path)?;
     #[cfg(unix)]
