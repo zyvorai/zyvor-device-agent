@@ -14,9 +14,12 @@ pub fn collect(cfg: &Config) -> DeviceIdentity {
     let machine_id = read_trim("/etc/machine-id");
     let hostname = read_trim("/etc/hostname");
     let serial = if cfg.device.serial == "auto" {
-        let dt = read_trim("/sys/firmware/devicetree/base/serial-number");
+        let dt = read_trim("/sys/firmware/devicetree/base/serial-number")
+            .trim_matches(char::from(0))
+            .trim()
+            .to_string();
         if !dt.is_empty() {
-            dt.trim_matches(char::from(0)).to_string()
+            dt
         } else if !machine_id.is_empty() {
             format!(
                 "ZY-{}",

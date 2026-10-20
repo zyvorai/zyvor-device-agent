@@ -33,6 +33,15 @@ pub fn ensure_self_signed_cert(cert_path: &str, key_path: &str) -> Result<()> {
     if cert_path.exists() && key_path.exists() {
         return Ok(());
     }
+    // Never overwrite a half-provisioned pair: regenerating would clobber the
+    // operator-supplied file that is still present.
+    if cert_path.exists() || key_path.exists() {
+        anyhow::bail!(
+            "TLS cert {} and key {} must both exist or both be absent; refusing to overwrite the existing one",
+            cert_path.display(),
+            key_path.display()
+        );
+    }
 
     tracing::info!(
         cert = %cert_path.display(),
@@ -71,15 +80,21 @@ pub fn ensure_self_signed_cert(cert_path: &str, key_path: &str) -> Result<()> {
 
     std::fs::write(cert_path, cert_key.cert.pem())
         .with_context(|| format!("writing {}", cert_path.display()))?;
-    std::fs::write(key_path, cert_key.signing_key.serialize_pem())
-        .with_context(|| format!("writing {}", key_path.display()))?;
-
-    // Private key: owner read/write only.
-    #[cfg(unix)]
+    // Private key: created owner read/write only (no window at default perms).
     {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(key_path, std::fs::Permissions::from_mode(0o600))
-            .with_context(|| format!("setting permissions on {}", key_path.display()))?;
+        use std::io::Write;
+        let mut opts = std::fs::OpenOptions::new();
+        opts.write(true).create_new(true);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::OpenOptionsExt;
+            opts.mode(0o600);
+        }
+        let mut f = opts
+            .open(key_path)
+            .with_context(|| format!("writing {}", key_path.display()))?;
+        f.write_all(cert_key.signing_key.serialize_pem().as_bytes())
+            .with_context(|| format!("writing {}", key_path.display()))?;
     }
 
     tracing::info!("self-signed TLS certificate generated");
@@ -110,6 +125,40 @@ mod tests {
         let cert_pem = std::fs::read_to_string(&cert_path).unwrap();
         assert!(cert_pem.contains("BEGIN CERTIFICATE"));
 
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn refuses_to_overwrite_when_only_cert_exists() {
+        let dir = test_dir("refuses_to_overwrite_when_only_cert_exists");
+        let cert_path = dir.join("server.crt");
+        let key_path = dir.join("server.key");
+        std::fs::write(&cert_path, "operator-cert").unwrap();
+
+        let r = ensure_self_signed_cert(cert_path.to_str().unwrap(), key_path.to_str().unwrap());
+
+        assert!(r.is_err());
+        assert_eq!(
+            std::fs::read_to_string(&cert_path).unwrap(),
+            "operator-cert"
+        );
+        assert!(!key_path.exists());
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn generated_key_is_private() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = test_dir("generated_key_is_private");
+        let key_path = dir.join("server.key");
+        ensure_self_signed_cert(
+            dir.join("server.crt").to_str().unwrap(),
+            key_path.to_str().unwrap(),
+        )
+        .unwrap();
+        let mode = std::fs::metadata(&key_path).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode, 0o600);
         std::fs::remove_dir_all(&dir).ok();
     }
 
