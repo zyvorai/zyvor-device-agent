@@ -18,6 +18,8 @@
 
 ### Discover the box. Report what is real.
 
+[Client overview (PDF)](docs/Device-Agent-Client-Overview.pdf)
+
 **Linux hardware edge agent for Zyvor — discover the box, expose physical interfaces, publish to Nodra, expose Fleet-compatible inventory.** A small, single-purpose Rust agent for ARM64 and amd64 gateways, with a local REST API and dashboard. No Kubernetes, no cloud required.
 
 **arm64 first-class** · **Read-only by design** · **Bearer, mTLS or Unix socket** · **Signed .deb / .rpm** · **No cloud required**
