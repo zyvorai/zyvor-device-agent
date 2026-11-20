@@ -1,6 +1,6 @@
 # Zyvor Device Agent: support subscriptions
 
-Zyvor Device Agent is source-available software. A commercial license is required to run it (sales@zyvor.dev); a 30-day trial key is how to evaluate.
+Zyvor Device Agent is source-available software. Free for evaluation, development, testing, research, education and other non-production use under the Zyvor Production License v1.0; any production use requires a paid commercial license ([pricing](https://zyvor.dev/pricing), sales@zyvor.dev). A 30-day trial key is available at [zyvor.dev/trial/start](https://zyvor.dev/trial/start).
 
 Teams that want supported releases and defined response targets can buy an annual **support subscription** from Zyvor.
 
@@ -25,7 +25,7 @@ Prices are in the [Pricing](#pricing) section below; custom pricing: contact [sa
 
 ## Pricing
 
-The support subscription is priced per device per year, on one ladder shared by Fleet, Relay, Device Agent, OTA and Nodra, with an annual minimum of USD 5,000 (INR 495,600 incl. GST in India) that applies to every step. A commercial license is required to run the software.
+The support subscription is priced per device per year, on one ladder shared by Fleet, Relay, Device Agent, OTA and Nodra, with an annual minimum of USD 5,000 (INR 495,600 incl. GST in India) that applies to every step. Production use requires a commercial license; non-production use is free under the Zyvor Production License v1.0.
 
 | Devices | Elsewhere (USD, excl. tax) | India (INR, incl. 18% GST) |
 |---|---|---|
