@@ -90,7 +90,7 @@ boundary, repository map and license — see the
 
 ## Is this for you?
 
-Device Agent is a small, single-purpose, open-source (Apache-2.0) hardware
+Device Agent is a small, single-purpose, source-available (Zyvor Production License v1.0) hardware
 layer for a Linux edge gateway. If you need a home-automation hub or a
 full container fleet/OTA platform instead, one of these is probably a
 closer fit; see the README's

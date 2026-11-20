@@ -5,7 +5,7 @@
 # Zyvor Device Agent
 
 <a href="https://github.com/zyvorai/zyvor-device-agent/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/zyvorai/zyvor-device-agent/ci.yml?branch=main&label=CI&logo=github" alt="CI status"></a>
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License: Apache-2.0"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-Zyvor_Production_1.0-blue.svg" alt="License: Zyvor Production License v1.0"></a>
 <img src="https://img.shields.io/badge/rust-1.85%2B-orange?logo=rust" alt="Rust 1.85+">
 <img src="https://img.shields.io/badge/platform-arm64%20%7C%20amd64-informational" alt="Platforms: arm64 | amd64">
 <img src="https://img.shields.io/badge/status-v0.2.0%20passport--and--flight--recorder-yellow" alt="Status: v0.2.0 passport and flight recorder">
@@ -80,7 +80,7 @@ It intentionally does **not** interpret Modbus registers, CAN/J1939 PGNs or OPC-
 
 ### Is this for you?
 
-Device Agent is a small, single-purpose, open-source (Apache-2.0) hardware
+Device Agent is a small, single-purpose, source-available (Zyvor Production License v1.0) hardware
 layer for a Linux edge gateway — not a home-automation hub, not a
 container fleet/OTA platform, and not tied to any one cloud vendor. If you
 need one of those instead, one of the alternatives below is probably a
@@ -93,7 +93,7 @@ this project's scope.
 |---|---|---|---|---|---|
 | Primary scope | Hardware inventory, health, bounded sensor/bus access | Home automation hub, integrations, local rules | Fleet OS + container deployment/OTA | Cloud-connected edge runtime | Cloud-connected edge runtime |
 | Cloud dependency | None required — Nodra/Fleet integration is optional | None required | balenaCloud (proprietary) for fleet management | AWS IoT Core | Azure IoT Hub |
-| License | Apache-2.0 | Apache-2.0 (core) | Open-source agent + proprietary cloud | Proprietary (free tier) | Proprietary (free tier) |
+| License | Zyvor Production License 1.0 (free non-production) | Apache-2.0 (core) | Open-source agent + proprietary cloud | Proprietary (free tier) | Proprietary (free tier) |
 | Industrial protocol decoding (Modbus/CAN-J1939/OPC-UA) | Deliberately out of scope — handed to Nodra | Via community integrations, not built for industrial fieldbus | Not built-in | Via custom components | Via custom modules |
 | Fleet/OTA orchestration | Out of scope — handed to Zyvor Fleet | Not built-in | Core feature | Via AWS services | Via Azure services |
 
@@ -605,14 +605,11 @@ Production and qualification detail: [PRODUCTION.md](docs/PRODUCTION.md) · [HIL
 
 ## Support
 
-Free under Apache-2.0. If it helps you, you can donate any amount you like: <https://rzp.io/rzp/utwdYh3>. A donation is voluntary and supports development and maintenance. It is not a purchase: it buys no support, SLA, features, priority or license, and it is not tax-deductible (Zyvor AI Labs Private Limited is a company, not a charity). Support contracts are separate: [sales@zyvor.dev](mailto:sales@zyvor.dev).
+Non-production use is free under the Zyvor Production License v1.0; production use requires a commercial license (sales@zyvor.dev). If it helps you, you can donate any amount you like: <https://rzp.io/rzp/utwdYh3>. A donation is voluntary and supports development and maintenance. It is not a purchase: it buys no support, SLA, features, priority or license, and it is not tax-deductible (Zyvor AI Labs Private Limited is a company, not a charity). Support contracts are separate: [sales@zyvor.dev](mailto:sales@zyvor.dev).
 
 ## License
 
-Zyvor Device Agent is **free and open source** under the [Apache License, Version 2.0](LICENSE).
-You may use, modify, and run it for personal, lab, and commercial production
-use at no charge, subject to Apache-2.0 (preserve notices / NOTICE where required).
-See [NOTICE](NOTICE).
+Zyvor Device Agent is source-available under the **[Zyvor Production License v1.0](LICENSE)** (SPDX `LicenseRef-Zyvor-Production-1.0`, also in [LICENSES/](LICENSES/LicenseRef-Zyvor-Production-1.0.txt); see [NOTICE](NOTICE)). Non-production use (evaluation, development, testing, research, education) is free. Production use requires a commercial license from Zyvor AI Labs Private Limited ([sales@zyvor.dev](mailto:sales@zyvor.dev), [zyvor.dev/buy](https://zyvor.dev/buy)); a 30-day trial key is available for production evaluation.
 
 **Zyvor Enterprise** adds what production teams ask for: supported releases, deployment and upgrade guidance, priority incident triage, a named technical contact and 24x7 critical intake. Production support, SLAs, and Zyvor Enterprise products are licensed separately. Plans and terms: [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md) · [Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=device-agent&utm_campaign=readme_license) · [sales@zyvor.dev](mailto:sales@zyvor.dev). Support from USD 8-18 per device per year (INR 793-1,784 incl. GST in India), USD 5,000 (INR 495,600) annual minimum; buy / get a quote at [zyvor.dev/buy](https://zyvor.dev/buy).
 

@@ -6,4 +6,4 @@
 4. Run `make ci` (same as `make check`: fmt, Clippy, tests, release build) before submitting a PR. It covers default features only. The dashboard is `make check-ui` and is not part of that gate. If you touched `--features tpm2` or `--features hotplug` code, also run `make lint-tpm2 test-tpm2` (needs `libtss2-dev`) and/or `make lint-hotplug test-hotplug` (Linux only — `netlink-sys` doesn't compile on macOS) — CI runs both regardless.
 5. Avoid introducing Kubernetes as a runtime dependency.
 
-All contributions are accepted under Apache-2.0.
+All contributions are accepted under the Zyvor Production License v1.0 (SPDX `LicenseRef-Zyvor-Production-1.0`).
