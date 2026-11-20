@@ -1,0 +1,72 @@
+{
+  "generated_at": "2026-09-14T12:49:25.367603+00:00",
+  "finished_at": "2026-09-14T12:49:26.158952+00:00",
+  "product": "zyvor-device-agent",
+  "version": "0.1.5",
+  "host": "Darwin",
+  "results": [
+    {
+      "id": "minewing_profile",
+      "status": "pass",
+      "detail": "",
+      "class": "software"
+    },
+    {
+      "id": "cargo_fmt",
+      "status": "pass",
+      "detail": "",
+      "class": "software"
+    },
+    {
+      "id": "clippy_default",
+      "status": "skip",
+      "detail": "DA_QUALIFY_FAST=1 \u2014 covered by CI rust-native",
+      "class": "software"
+    },
+    {
+      "id": "unit_tests",
+      "status": "skip",
+      "detail": "DA_QUALIFY_FAST=1 \u2014 covered by CI rust-native",
+      "class": "software"
+    },
+    {
+      "id": "nodra_mqtts_config",
+      "status": "pass",
+      "detail": "3 MQTTS unit tests",
+      "class": "software"
+    },
+    {
+      "id": "hardware_hil_minewing",
+      "status": "skip",
+      "detail": "operator-signed \u2014 evidence/qualification/hardware-checklist.md",
+      "class": "software"
+    },
+    {
+      "id": "arm64_native_deb_rpm",
+      "status": "pass",
+      "detail": "CI packages-arm64 + release matrix ubuntu-24.04-arm",
+      "class": "software"
+    },
+    {
+      "id": "emulator_vcan_ci",
+      "status": "pass",
+      "detail": "scripts/emulator/smoke-vcan.sh + CI emulator-vcan",
+      "class": "software"
+    },
+    {
+      "id": "emulator_swtpm_ci",
+      "status": "pass",
+      "detail": "scripts/emulator/smoke-swtpm.sh + CI emulator-swtpm",
+      "class": "software"
+    },
+    {
+      "id": "emulator_v4l2_ci",
+      "status": "skip",
+      "detail": "scripts/emulator/smoke-v4l2.sh + CI emulator-v4l2 (soft-skip OK) \u2014 host reported soft-skip",
+      "class": "software"
+    }
+  ],
+  "software_pass": true,
+  "ops_claimed": false,
+  "note": "Hardware rows remain skip until Minewing GW1 r1 HIL is signed."
+}

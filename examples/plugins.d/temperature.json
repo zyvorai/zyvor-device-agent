@@ -1,0 +1,13 @@
+{
+  "name": "temperature-demo",
+  "version": "0.1.0",
+  "command": "/usr/lib/zyvor-device-agent/plugins/temperature-demo",
+  "args": [],
+  "capabilities": [
+    "temperature",
+    "i2c"
+  ],
+  "enabled": false,
+  "description": "Legacy demo plugin manifest; disabled by default.",
+  "publish_to_nodra": false
+}

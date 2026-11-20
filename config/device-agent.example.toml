@@ -1,0 +1,205 @@
+[server]
+# Loopback by default. Non-loopback with auth.mode = "none" is refused unless
+# allow_unauthenticated_remote = true.
+listen = "127.0.0.1:9188"
+dashboard_dir = "/usr/share/zyvor-device-agent/dashboard"
+allow_unauthenticated_remote = false
+state_dir = "/var/lib/zyvor-device-agent"
+
+[server.unix_socket]
+# Additional API listener over a Unix socket, alongside the TCP listener above.
+# Peer uid/gid must be explicitly allowlisted below (empty lists deny everyone).
+enabled = false
+path = "/run/zyvor-device-agent/api.sock"
+file_mode = 0o660
+allow_uids = []
+allow_gids = []
+
+[server.cors]
+# Off by default: the bundled dashboard is served same-origin and needs no CORS
+# layer. Enable only for a cross-origin dashboard/integration.
+enabled = false
+allowed_origins = []
+
+[server.rate_limit]
+# On by default with generous limits — pure DoS protection, no behavior change
+# for normal traffic. Applies per peer IP, TCP listener only (not the Unix socket).
+enabled = true
+requests_per_second = 20
+burst = 40
+
+[server.tls]
+# Off by default. Independent of [auth] mode: unlike auth.mode = "mtls", this
+# never requires a client certificate — it only encrypts the connection and
+# proves the daemon's own identity, so an ordinary browser can reach
+# https://<host>:9188/ with no extra setup. If no cert exists at the paths
+# below, one is generated automatically on first start (see src/tls.rs).
+# Mount a real cert at the same paths instead if you have one.
+enabled = false
+cert_path = "/etc/zyvor/device-agent/tls/server.crt"
+key_path = "/etc/zyvor/device-agent/tls/server.key"
+
+[camera]
+# --features camera build only (off by default, like hotplug/tpm2). No
+# /dev/video* is ever opened unless explicitly declared below - same
+# "never auto-scan" posture as [industrial.can_capture]'s interface
+# allowlist. See docs/CAMERA.md.
+devices = []
+
+# [[camera.devices]]
+# id = "front-dock"
+# path = "/dev/video0"
+# enabled = true
+# max_frames_per_second = 10
+# jpeg_quality = 75
+# max_stream_clients = 4
+# publish_to_nodra = true
+
+[edge_ai]
+# --features edge-ai build only for the HTTP routes (off by default).
+# Scaffold: never starts an NPU/GPU backend even when enabled = true —
+# GET /api/v1/inference/events returns 501 not-configured. See docs/EDGE_AI.md.
+enabled = false
+accelerator = ""
+publish_to_nodra = true
+
+[privsep]
+# Privilege-separation helper for the daemon's own bus access.
+# Default false keeps today's root + direct /dev opens. With enabled = true
+# and --features privsep, serve starts bus-helper over an authenticated UDS.
+enabled = false
+helper_path = "/usr/lib/zyvor-device-agent/bus-helper"
+socket_path = "/run/zyvor-device-agent/bus.sock"
+allow_uids = []
+allow_gids = []
+
+[recorder]
+enabled = true
+directory = ""
+segment_bytes = 1048576
+max_bytes = 33554432
+can_frames = false
+redact_can_payload = true
+
+[remediation]
+enabled = false
+fleet_public_key_pem = ""
+service_allowlist = []
+can_allowlist = []
+two_person = true
+
+[auth]
+# "none" is only for loopback. Use bearer or mtls for non-loopback binds.
+mode = "none"
+exempt_paths = ["/api/v1/health", "/api/v1/ready"]
+stream_ticket_ttl_seconds = 60
+
+[auth.bearer]
+token_hash_file = "/etc/zyvor/device-agent/auth/bearer.sha256"
+
+# mode = "mtls": run `zyvor-device-agent enroll` first (see [enrollment] below
+# and docs/MTLS_ENROLLMENT.md) to populate cert_file/key_file, then set
+# require_client_cert = true once client_ca_file is in place.
+[auth.mtls]
+cert_file = "/etc/zyvor/device-agent/identity/device-cert.pem"
+key_file = "/etc/zyvor/device-agent/identity/device-key.pem"
+client_ca_file = "/etc/zyvor/device-agent/identity/client-ca.pem"
+require_client_cert = false
+
+[enrollment]
+enabled = false
+server_url = ""
+token_file = "/etc/zyvor/device-agent/identity/enrollment-token"
+ca_bundle_file = ""
+common_name = ""
+revocation_check = false
+
+# Where the mTLS private key above actually lives. policy = "required" is the
+# production setting for Minew and other TPM boards; preferred keeps the
+# software fallback for laptops and CI.
+[identity]
+backend = "software"
+policy = "preferred"
+tpm_tcti = ""
+
+[device]
+vendor = "Generic"
+model = "Reference ARM64 Gateway"
+serial = "auto"
+profile = "generic-reference-arm64"
+profile_directory = "profiles"
+telemetry_interval_seconds = 10
+inventory_refresh_seconds = 5
+
+[industrial]
+# Read-only SocketCAN enrichment. Set to "" to use sysfs-only discovery.
+can_ip_command = "ip"
+# Declare only ports wired/configured for RS485 on your board. No active serial probing is performed.
+rs485_ports = []
+publish_to_nodra = true
+
+[industrial.can_capture]
+# RX only. No transmit path exists. Explicitly allowlist interfaces to capture.
+enabled = false
+interfaces = []
+history_limit = 512
+max_frames_per_second = 200
+include_error_frames = false
+publish_to_nodra = true
+
+[thresholds]
+# Off by default. When enabled, crossing a level emits threshold.breached /
+# threshold.recovered on the SSE event stream and (if nodra.enabled) the
+# Nodra agent-event topic - evaluated once per inventory-refresh tick.
+enabled = false
+thermal_warn_celsius = 75.0
+thermal_critical_celsius = 90.0
+# SocketCAN controller error counters (0-255): 96/128 are the conventional
+# CAN error-warning/error-passive levels.
+can_error_counter_warn = 96
+can_error_counter_critical = 128
+
+[nodra]
+enabled = false
+broker = "127.0.0.1"
+port = 1883
+client_id = "zyvor-device-agent"
+topic_prefix = "zyvor/device"
+retain_inventory = true
+# username = ""
+# password = ""
+# Plain MQTT is for trusted LAN / loopback only. For production or any
+# untrusted path, enable MQTTS:
+# [nodra.tls]
+# enabled = true
+# ca_file = "/etc/zyvor/mqtt-ca.pem"   # empty = system/webpki roots
+# cert_file = ""                      # optional client cert
+# key_file = ""
+
+[fleet]
+enabled = true
+mode = "projection"
+
+[plugins]
+directory = "/etc/zyvor/device-agent/plugins.d"
+timeout_seconds = 3
+sample_interval_seconds = 5
+require_absolute_command = true
+reject_world_writable = true
+max_output_bytes = 262144
+# Drop plugin subprocesses to a lower-privilege uid/gid (the daemon itself still runs
+# as root). Opt-in: the target account must be in whatever device group (i2c/gpio/spi/
+# dialout) a given plugin needs — see docs/HARDWARE_PERMISSIONS.md.
+# run_as_uid = 1500
+# run_as_gid = 1500
+# Only allow plugin commands owned by one of these uids/usernames, and/or living under
+# one of these directory prefixes. Both empty = no restriction (today's behavior).
+allowed_owners = []
+allowed_directories = []
+# RLIMIT_AS / RLIMIT_CPU / RLIMIT_NPROC applied to plugin subprocesses. Unset = no limit.
+# max_memory_bytes = 67108864
+# max_cpu_seconds = 5
+# max_processes = 4
+# Linux only: seccomp-bpf denylist blocking ptrace/mount/module-loading/etc. with EPERM,
+# on top of the identity drop and rlimits above. See docs/PLUGIN_PROTOCOL.md.
+seccomp_enabled = false

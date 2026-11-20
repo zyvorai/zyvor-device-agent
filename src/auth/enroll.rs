@@ -1,0 +1,339 @@
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+
+//! Client-side enrollment for `auth.mode = "mtls"`.
+//!
+//! Device Agent generates its own keypair and CSR locally (the private key never
+//! leaves this function in plaintext form beyond the files written at the end),
+//! submits the CSR plus a single-use enrollment token to `enrollment.server_url`,
+//! and persists whatever certificate the server returns. There is deliberately no
+//! CA or certificate-signing logic here: Fleet's enrollment token system today
+//! issues an opaque bearer-style token, not a signed certificate, and building a
+//! production CA (key custody, revocation, rotation) is a separate, security-
+//! sensitive project of its own. This module only plays the client side of
+//! whatever server implements the protocol below - see `docs/MTLS_ENROLLMENT.md`.
+//!
+//! Wire protocol (JSON over HTTPS):
+//! `POST {server_url}` with `Authorization: Bearer <token>` and body
+//! `{"csr_pem": "...", "common_name": "..."}`; a 200 response body of
+//! `{"certificate_pem": "...", "ca_bundle_pem": "..."}` is treated as success.
+
+use std::{fs, path::Path};
+
+use anyhow::{bail, Context};
+use rcgen::{CertificateParams, DistinguishedName, DnType};
+use serde::{Deserialize, Serialize};
+use tracing::info;
+
+use crate::{
+    config::Config,
+    identity::{write_identity_file, DeviceIdentity},
+};
+
+#[derive(Debug, Serialize)]
+struct EnrollRequest {
+    csr_pem: String,
+    common_name: String,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    renew: bool,
+}
+
+#[derive(Debug, Deserialize)]
+struct EnrollResponse {
+    certificate_pem: String,
+    #[serde(default)]
+    ca_bundle_pem: String,
+}
+
+/// Runs the enrollment flow: generate keypair + CSR, submit to
+/// `enrollment.server_url`, persist the issued certificate/key.
+///
+/// Refuses to run (without `force`) if a certificate already exists at
+/// `auth.mtls.cert_file`, so a stray re-run can't silently clobber a working
+/// identity - use `--force` for deliberate reissuance.
+pub async fn run(cfg: &Config, force: bool) -> anyhow::Result<()> {
+    if !cfg.enrollment.enabled {
+        bail!("enrollment.enabled = false; nothing to do");
+    }
+    if cfg.enrollment.server_url.is_empty() {
+        bail!("enrollment.server_url is not configured");
+    }
+
+    let cert_path = Path::new(&cfg.auth.mtls.cert_file);
+    if cert_path.exists() && !force {
+        bail!(
+            "{} already exists; pass --force to reissue",
+            cert_path.display()
+        );
+    }
+
+    let token = fs::read_to_string(&cfg.enrollment.token_file)
+        .with_context(|| {
+            format!(
+                "reading enrollment token from {}",
+                cfg.enrollment.token_file
+            )
+        })?
+        .trim()
+        .to_string();
+    if token.is_empty() {
+        bail!(
+            "enrollment token file {} is empty",
+            cfg.enrollment.token_file
+        );
+    }
+
+    let common_name = if cfg.enrollment.common_name.is_empty() {
+        cfg.device.serial.clone()
+    } else {
+        cfg.enrollment.common_name.clone()
+    };
+    if common_name.is_empty() {
+        bail!("enrollment.common_name is empty and device.serial is not set");
+    }
+
+    let identity = DeviceIdentity::generate(cfg)?;
+    let mut params = CertificateParams::new(Vec::new()).context("building CSR parameters")?;
+    let mut dn = DistinguishedName::new();
+    dn.push(DnType::CommonName, common_name.as_str());
+    params.distinguished_name = dn;
+    let csr = params
+        .serialize_request(&identity.rcgen_signing_key())
+        .context("serializing CSR")?;
+    let csr_pem = csr.pem().context("PEM-encoding CSR")?;
+
+    let mut client_builder = reqwest::Client::builder();
+    if !cfg.enrollment.ca_bundle_file.is_empty() {
+        let ca_pem = fs::read(&cfg.enrollment.ca_bundle_file).with_context(|| {
+            format!(
+                "reading enrollment.ca_bundle_file {}",
+                cfg.enrollment.ca_bundle_file
+            )
+        })?;
+        let ca_cert =
+            reqwest::Certificate::from_pem(&ca_pem).context("parsing enrollment.ca_bundle_file")?;
+        client_builder = client_builder.add_root_certificate(ca_cert);
+    }
+    let client = client_builder.build().context("building HTTPS client")?;
+
+    info!(url = %cfg.enrollment.server_url, %common_name, "submitting CSR for enrollment");
+    let response = client
+        .post(&cfg.enrollment.server_url)
+        .bearer_auth(&token)
+        .json(&EnrollRequest {
+            csr_pem,
+            common_name: common_name.clone(),
+            renew: false,
+        })
+        .send()
+        .await
+        .context("submitting enrollment request")?;
+
+    if !response.status().is_success() {
+        let status = response.status();
+        let body = response.text().await.unwrap_or_default();
+        bail!("enrollment server returned {status}: {body}");
+    }
+    let enrolled: EnrollResponse = response
+        .json()
+        .await
+        .context("parsing enrollment server response")?;
+
+    write_identity_file(
+        &cfg.auth.mtls.cert_file,
+        enrolled.certificate_pem.as_bytes(),
+    )?;
+    identity.persist(&cfg.auth.mtls.key_file)?;
+    if !enrolled.ca_bundle_pem.is_empty() && !cfg.auth.mtls.client_ca_file.is_empty() {
+        write_identity_file(
+            &cfg.auth.mtls.client_ca_file,
+            enrolled.ca_bundle_pem.as_bytes(),
+        )?;
+    }
+
+    // Single-use: the server should already reject a replayed token, but
+    // removing it locally means a compromised disk image can't accidentally
+    // hand out a live token from a previous enrollment.
+    if let Err(error) = fs::remove_file(&cfg.enrollment.token_file) {
+        if error.kind() != std::io::ErrorKind::NotFound {
+            tracing::warn!(%error, "failed to remove enrollment token after successful enrollment");
+        }
+    }
+
+    info!(
+        cert_file = %cfg.auth.mtls.cert_file,
+        key_file = %cfg.auth.mtls.key_file,
+        backend = identity.backend_name(),
+        "enrollment complete"
+    );
+    audit(cfg, "enrolled");
+    Ok(())
+}
+
+/// Reissue a certificate for an already-enrolled device. The enrollment
+/// server must accept `renew: true`. The local token file is not deleted.
+pub async fn renew(cfg: &Config) -> anyhow::Result<()> {
+    if !cfg.enrollment.enabled {
+        bail!("enrollment.enabled = false; nothing to do");
+    }
+    if cfg.enrollment.server_url.is_empty() {
+        bail!("enrollment.server_url is not configured");
+    }
+    let token = fs::read_to_string(&cfg.enrollment.token_file)
+        .unwrap_or_default()
+        .trim()
+        .to_string();
+    if token.is_empty() {
+        bail!("renewal requires a token in {}", cfg.enrollment.token_file);
+    }
+    let common_name = if cfg.enrollment.common_name.is_empty() {
+        cfg.device.serial.clone()
+    } else {
+        cfg.enrollment.common_name.clone()
+    };
+    let identity = DeviceIdentity::generate(cfg)?;
+    let mut params = CertificateParams::new(Vec::new()).context("building CSR parameters")?;
+    let mut dn = DistinguishedName::new();
+    dn.push(DnType::CommonName, common_name.as_str());
+    params.distinguished_name = dn;
+    let csr = params
+        .serialize_request(&identity.rcgen_signing_key())
+        .context("serializing CSR")?;
+    let csr_pem = csr.pem().context("PEM-encoding CSR")?;
+    let client = reqwest::Client::builder()
+        .build()
+        .context("building HTTPS client")?;
+    let response = client
+        .post(&cfg.enrollment.server_url)
+        .bearer_auth(&token)
+        .json(&EnrollRequest {
+            csr_pem,
+            common_name,
+            renew: true,
+        })
+        .send()
+        .await
+        .context("submitting renewal")?;
+    if !response.status().is_success() {
+        let status = response.status();
+        let body = response.text().await.unwrap_or_default();
+        bail!("renewal server returned {status}: {body}");
+    }
+    let enrolled: EnrollResponse = response.json().await.context("parsing renewal response")?;
+    write_identity_file(
+        &cfg.auth.mtls.cert_file,
+        enrolled.certificate_pem.as_bytes(),
+    )?;
+    identity.persist(&cfg.auth.mtls.key_file)?;
+    audit(cfg, "renewed");
+    Ok(())
+}
+
+pub async fn ensure_not_revoked(cfg: &Config) -> anyhow::Result<()> {
+    if !cfg.enrollment.revocation_check {
+        return Ok(());
+    }
+    if cfg.enrollment.server_url.is_empty() {
+        bail!("enrollment.revocation_check is set but enrollment.server_url is empty");
+    }
+    let url = revocation_url(&cfg.enrollment.server_url);
+    let common_name = if cfg.enrollment.common_name.is_empty() {
+        cfg.device.serial.clone()
+    } else {
+        cfg.enrollment.common_name.clone()
+    };
+    let url = format!("{url}?common_name={common_name}");
+    let client = reqwest::Client::builder()
+        .build()
+        .context("building revocation client")?;
+    let response = client
+        .get(&url)
+        .send()
+        .await
+        .context("checking certificate revocation")?;
+    if !response.status().is_success() {
+        bail!("revocation check returned {}", response.status());
+    }
+    let body: RevocationStatus = response.json().await.context("parsing revocation status")?;
+    audit(
+        cfg,
+        if body.revoked {
+            "revoked"
+        } else {
+            "not-revoked"
+        },
+    );
+    if body.revoked {
+        bail!("device certificate is revoked");
+    }
+    Ok(())
+}
+
+#[derive(Debug, Deserialize)]
+struct RevocationStatus {
+    revoked: bool,
+}
+
+fn revocation_url(server_url: &str) -> String {
+    if let Some(stripped) = server_url.strip_suffix("/enroll") {
+        format!("{stripped}/revocation")
+    } else {
+        format!("{server_url}/revocation")
+    }
+}
+
+fn audit(cfg: &Config, action: &str) {
+    let path = std::path::Path::new(&cfg.server.state_dir).join("enrollment-audit.log");
+    if let Some(parent) = path.parent() {
+        let _ = fs::create_dir_all(parent);
+    }
+    let line = format!(
+        "{{\"at_unix_ms\":{},\"action\":\"{action}\"}}\n",
+        crate::state::now_unix_ms()
+    );
+    if let Ok(mut file) = fs::OpenOptions::new().create(true).append(true).open(path) {
+        use std::io::Write;
+        let _ = file.write_all(line.as_bytes());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn refuses_when_enrollment_disabled() {
+        let cfg = Config::default();
+        let error = run(&cfg, false).await.unwrap_err();
+        assert!(error.to_string().contains("enrollment.enabled"));
+    }
+
+    #[tokio::test]
+    async fn refuses_without_server_url() {
+        let mut cfg = Config::default();
+        cfg.enrollment.enabled = true;
+        let error = run(&cfg, false).await.unwrap_err();
+        assert!(error.to_string().contains("server_url"));
+    }
+
+    #[tokio::test]
+    async fn refuses_to_reissue_without_force() {
+        let dir = std::env::temp_dir().join(format!(
+            "zyvor-enroll-test-{}-{}",
+            std::process::id(),
+            "refuses_to_reissue_without_force"
+        ));
+        fs::create_dir_all(&dir).unwrap();
+        let cert_path = dir.join("device-cert.pem");
+        fs::write(&cert_path, b"placeholder").unwrap();
+
+        let mut cfg = Config::default();
+        cfg.enrollment.enabled = true;
+        cfg.enrollment.server_url = "https://example.invalid/enroll".into();
+        cfg.auth.mtls.cert_file = cert_path.to_string_lossy().into_owned();
+
+        let error = run(&cfg, false).await.unwrap_err();
+        assert!(error.to_string().contains("--force"));
+
+        fs::remove_dir_all(&dir).ok();
+    }
+}

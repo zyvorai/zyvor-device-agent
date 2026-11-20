@@ -1,0 +1,177 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  packages: write
+
+jobs:
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push multi-arch image
+        id: build
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          docker buildx build --platform linux/amd64,linux/arm64 --push \
+            -t "ghcr.io/zyvorai/device-agent:${VERSION}" \
+            -t ghcr.io/zyvorai/device-agent:latest \
+            --metadata-file metadata.json .
+          echo "digest=$(jq -r '.["containerimage.digest"]' metadata.json)" >> "$GITHUB_OUTPUT"
+      - uses: sigstore/cosign-installer@v3
+      - name: Sign image (keyless, GitHub OIDC)
+        run: cosign sign --yes "ghcr.io/zyvorai/device-agent@${{ steps.build.outputs.digest }}"
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-name: ghcr.io/zyvorai/device-agent
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+  # Native package builds per arch — arm64 uses GitHub's ubuntu-24.04-arm
+  # runners so .deb/.rpm metadata and $auto depends stay correct (no cross).
+  packages:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+            rust_target: ''
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+            rust_target: ''
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Dashboard
+        run: cd web/dashboard && npm install --no-audit --no-fund && npm test && npm run build
+      - name: Test and build (amd64 only — arm64 validated in CI packages-arm64)
+        if: matrix.arch == 'amd64'
+        run: cargo test --all && cargo build --release
+      - name: Build release binary (arm64)
+        if: matrix.arch == 'arm64'
+        run: cargo build --release
+      - name: Packaging tools
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev binutils file rpm || sudo apt-get install -y dpkg-dev binutils file
+      - name: Build .deb / .rpm
+        run: |
+          chmod +x scripts/package-deb-rpm.sh
+          ./scripts/package-deb-rpm.sh
+      - name: Release tarball
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ARCH="linux-${{ matrix.arch }}"
+          VERSION="$VERSION" ARCH="$ARCH" ./scripts/package.sh
+      - uses: actions/upload-artifact@v7
+        with:
+          name: packages-${{ matrix.arch }}
+          path: |
+            dist/*.deb
+            dist/*.rpm
+            dist/*.tar.gz
+
+  release:
+    needs: [packages]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python3 scripts/check-static.py
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: packages-*
+          path: dist
+          merge-multiple: true
+      - name: List artifacts
+        run: find dist -type f | sort
+      - name: Checksums
+        run: |
+          cd dist
+          sha256sum *.tar.gz *.deb *.rpm > SHA256SUMS
+      - name: Generate Rust SBOM
+        run: |
+          cargo install cargo-cyclonedx --locked
+          cargo cyclonedx --format json
+          mv *.cdx.json dist/sbom-rust.cdx.json
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Generate dashboard SBOM
+        run: |
+          cd web/dashboard
+          npm install --no-audit --no-fund
+          npm sbom --sbom-format cyclonedx > ../../dist/sbom-dashboard.cdx.json
+      - uses: sigstore/cosign-installer@v3
+      - name: Sign checksums and SBOMs (keyless, GitHub OIDC)
+        run: |
+          cosign sign-blob --yes dist/SHA256SUMS \
+            --output-signature dist/SHA256SUMS.sig --output-certificate dist/SHA256SUMS.pem
+          cosign sign-blob --yes dist/sbom-rust.cdx.json \
+            --output-signature dist/sbom-rust.cdx.json.sig --output-certificate dist/sbom-rust.cdx.json.pem
+          cosign sign-blob --yes dist/sbom-dashboard.cdx.json \
+            --output-signature dist/sbom-dashboard.cdx.json.sig --output-certificate dist/sbom-dashboard.cdx.json.pem
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: 'dist/*.tar.gz,dist/*.deb,dist/*.rpm'
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          NOTES=$(awk -v ver="$VERSION" '
+            /^## / {
+              if (found) exit
+              line = $0
+              sub(/^## /, "", line)
+              split(line, parts, " ")
+              heading_ver = parts[1]
+              sub(/-dev$/, "", heading_ver)
+              if (heading_ver == ver) { found = 1 }
+              next
+            }
+            found { print }
+          ' CHANGELOG.md)
+          if [ -z "$NOTES" ]; then
+            echo "::warning::No CHANGELOG.md section matched version $VERSION; falling back to the top section"
+            NOTES=$(awk '/^## /{if(found) exit; found=1; next} found{print}' CHANGELOG.md)
+          fi
+          {
+            echo "notes<<ZYVOR_CHANGELOG_EOF"
+            echo "$NOTES"
+            echo "ZYVOR_CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+      - uses: softprops/action-gh-release@v3
+        with:
+          body: ${{ steps.changelog.outputs.notes }}
+          files: |
+            dist/*.tar.gz
+            dist/*.deb
+            dist/*.rpm
+            dist/SHA256SUMS
+            dist/SHA256SUMS.sig
+            dist/SHA256SUMS.pem
+            dist/sbom-*.cdx.json
+            dist/sbom-*.cdx.json.sig
+            dist/sbom-*.cdx.json.pem
