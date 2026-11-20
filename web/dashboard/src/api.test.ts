@@ -1,3 +1,6 @@
+// Copyright 2026 Zyvor AI Labs · https://zyvor.dev
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+
 import { beforeEach, describe, expect, it } from 'vitest';
 import { bitrate, bytes, duration, getToken, setToken, withStreamTicket } from './api';
 

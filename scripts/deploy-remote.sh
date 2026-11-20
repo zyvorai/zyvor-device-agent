@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright 2026 Zyvor AI Labs · https://zyvor.dev
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+
 # Deploy zyvor-device-agent to a remote Linux host over SSH.
 #
 # Mirrors the ../fabric/scripts/deploy-remote.sh convention: nothing is
