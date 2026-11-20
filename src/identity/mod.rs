@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 
 //! Abstraction over *where the mTLS device private key lives and signs*,
 //! used by [`crate::auth::enroll`] (generating/persisting the key) and

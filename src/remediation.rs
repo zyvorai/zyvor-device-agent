@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 
 //! Signed, allowlisted remediation. There is no shell and no arbitrary exec.
 //! Disruptive actions can require a second signature.

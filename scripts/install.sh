@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 # Zero-touch / local install for Zyvor Device Agent.
 #
 #   curl -fsSL https://get.zyvor.dev/device-agent | sudo sh -s -- --enrollment-token TOKEN

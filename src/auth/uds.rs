@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 
 //! Unix-domain-socket API listener with kernel-enforced peer-credential RBAC.
 //! Additive to the TCP listener — same `Router`, same handlers, just a second

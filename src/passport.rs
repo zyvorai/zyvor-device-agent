@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 
 //! Versioned device passport. Fleet, Yard, and support consume this document.
 //! It reuses the live inventory; it is not a second hardware model.

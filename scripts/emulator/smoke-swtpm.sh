@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 # Smoke: generate/persist/sign a TPM-backed identity against swtpm.
 set -euo pipefail
 

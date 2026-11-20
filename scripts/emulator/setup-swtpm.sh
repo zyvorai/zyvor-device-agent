@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 # Start swtpm (TPM2 emulator) and export ZYVOR_SWTPM_TCTI for tests.
 set -euo pipefail
 

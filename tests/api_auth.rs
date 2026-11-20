@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 //
 // End-to-end HTTP-level test: builds the real Router (auth::dispatch middleware
 // included) and drives it via tower::ServiceExt::oneshot, proving the middleware

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 //
 // End-to-end HTTP-level tests for the camera routes, driven the same way
 // tests/api_auth.rs drives the auth middleware: build the real Router and

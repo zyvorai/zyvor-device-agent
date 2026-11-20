@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
 
 //! Opt-in, explicitly-allowlisted camera capture — one dedicated OS thread
 //! per configured camera, mirroring `can_capture.rs`'s posture: never
