@@ -18,7 +18,6 @@
 
 ### Discover the box. Report what is real.
 
-[Client overview (PDF)](docs/Device-Agent-Client-Overview.pdf)
 
 **Linux hardware edge agent for Zyvor — discover the box, expose physical interfaces, publish to Nodra, expose Fleet-compatible inventory.** A small, single-purpose Rust agent for ARM64 and amd64 gateways, with a local REST API and dashboard. No Kubernetes, no cloud required.
 
@@ -63,50 +62,21 @@ It intentionally does **not** interpret Modbus registers, CAN/J1939 PGNs or OPC-
 
 ---
 
-## Zyvor Device Agent vs AWS IoT Greengrass
-
-![Zyvor Device Agent vs AWS IoT Greengrass: a hardware layer, not a cloud runtime](docs/ux/readme-vs.jpg)
-
-| | **Zyvor Device Agent** | **AWS IoT Greengrass** (cloud-connected edge runtime) |
-|---|---|---|
-| Primary job | Hardware inventory, health and bounded bus access | Run and manage edge software components deployed from AWS |
-| Management plane | None required; optional Nodra (MQTT) and Zyvor Fleet | AWS IoT Core and Greengrass deployments in an AWS account |
-| Hardware and bus discovery | Built in: GPIO, I2C, SPI, UART, CAN, USB, watchdog, thermal | Not its focus; built as custom components |
-| CAN | SocketCAN health plus RX-only, allowlisted frame capture | Through custom components |
-| Industrial protocol decoding | Deliberately out of scope — handed to Nodra | Through custom components |
-| Device identity | Device passport, mTLS enrollment, optional TPM2 key | X.509 device certificates registered with AWS IoT |
-| Footprint | One Rust daemon, `.deb` / `.rpm` / multi-arch OCI image, systemd | The Greengrass nucleus plus the components you deploy |
-| **Choose AWS IoT Greengrass when** | | You are standardising on AWS and want to deploy and manage edge application components from the cloud |
-
 ### Is this for you?
 
 Device Agent is a small, single-purpose, source-available (Zyvor Production License v1.0) hardware
-layer for a Linux edge gateway — not a home-automation hub, not a
-container fleet/OTA platform, and not tied to any one cloud vendor. If you
-need one of those instead, one of the alternatives below is probably a
-better fit; if you need a lightweight, protocol-agnostic hardware/health
-layer that hands industrial protocol semantics and fleet lifecycle to
-purpose-built systems instead of doing everything itself, that's exactly
-this project's scope.
-
-| | **Device Agent** | Home Assistant | balena | AWS IoT Greengrass | Azure IoT Edge |
-|---|---|---|---|---|---|
-| Primary scope | Hardware inventory, health, bounded sensor/bus access | Home automation hub, integrations, local rules | Fleet OS + container deployment/OTA | Cloud-connected edge runtime | Cloud-connected edge runtime |
-| Cloud dependency | None required — Nodra/Fleet integration is optional | None required | balenaCloud (proprietary) for fleet management | AWS IoT Core | Azure IoT Hub |
-| License | Zyvor Production License 1.0 (free non-production) | Apache-2.0 (core) | Open-source agent + proprietary cloud | Proprietary (free tier) | Proprietary (free tier) |
-| Industrial protocol decoding (Modbus/CAN-J1939/OPC-UA) | Deliberately out of scope — handed to Nodra | Via community integrations, not built for industrial fieldbus | Not built-in | Via custom components | Via custom modules |
-| Fleet/OTA orchestration | Out of scope — handed to Zyvor Fleet | Not built-in | Core feature | Via AWS services | Via Azure services |
-
-*(General characterizations as of writing, not exhaustive — verify current
-details against each project's own docs before deciding.)*
+layer for a Linux edge gateway. It is not a home-automation hub, not a
+container fleet/OTA platform, and not tied to any one cloud vendor. It is a
+lightweight, protocol-agnostic hardware/health layer that hands industrial
+protocol semantics and fleet lifecycle to purpose-built systems (Nodra and
+Zyvor Fleet) instead of doing everything itself.
 
 **Supported hardware**: `docs/REFERENCE_HARDWARE.md` defines a capability
-profile, not a certified SKU list — arm64 is first-class, amd64 works for
-development/CI, and any board meeting the minimum bus requirements (1×
-ethernet/I²C/UART/CAN; GPIO/SPI/USB/watchdog recommended) is supported.
-There is no fixed hardware compatibility list to check against; if your
-board exposes standard Linux `/dev`/`/sys` interfaces for these buses, it
-works.
+profile, not a certified SKU list. arm64 is first-class, amd64 works for
+development/CI, and any board meeting the minimum bus requirements (1x
+ethernet/I2C/UART/CAN; GPIO/SPI/USB/watchdog recommended) is supported.
+If your board exposes standard Linux `/dev`/`/sys` interfaces for these
+buses, it works.
 
 New to Device Agent? [`docs/FAQ.md`](docs/FAQ.md) covers licensing,
 support, production-readiness and data-residency questions, and

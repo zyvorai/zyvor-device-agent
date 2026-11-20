@@ -91,30 +91,7 @@ boundary, repository map and license — see the
 ## Is this for you?
 
 Device Agent is a small, single-purpose, source-available (Zyvor Production License v1.0) hardware
-layer for a Linux edge gateway. If you need a home-automation hub or a
-full container fleet/OTA platform instead, one of these is probably a
-closer fit; see the README's
-[full comparison table](https://github.com/zyvorai/device-agent#is-this-for-you)
-for AWS IoT Greengrass and Azure IoT Edge as well.
-
-<div class="compare-cards" markdown="1">
-
-- **Device Agent**
-
-  Hardware inventory, health, and bounded sensor/bus access. No cloud
-  dependency required — Nodra/Fleet integration is optional. Industrial
-  protocol decoding and fleet/OTA orchestration are deliberately out of
-  scope, handed to Nodra and Zyvor Fleet.
-
-- **Home Assistant**
-
-  Home automation hub, integrations, and local rules. Industrial fieldbus
-  support, if any, comes through community integrations, not a built-in
-  primitive.
-
-- **balena**
-
-  Fleet OS plus container deployment/OTA as its core feature, backed by
-  balenaCloud (proprietary) for fleet management.
-
-</div>
+layer for a Linux edge gateway: hardware inventory, health, and bounded
+sensor/bus access. No cloud dependency is required, and Nodra/Fleet integration
+is optional. Industrial protocol decoding and fleet/OTA orchestration are
+deliberately out of scope, handed to Nodra and Zyvor Fleet.
