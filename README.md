@@ -614,7 +614,7 @@ You may use, modify, and run it for personal, lab, and commercial production
 use at no charge, subject to Apache-2.0 (preserve notices / NOTICE where required).
 See [NOTICE](NOTICE).
 
-**Zyvor Enterprise** adds what production teams ask for: supported releases, deployment and upgrade guidance, priority incident triage, a named technical contact and 24x7 critical intake. Production support, SLAs, and Zyvor Enterprise products are licensed separately. Plans and terms: [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md) · [Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=device-agent&utm_campaign=readme_license) · [sales@zyvor.dev](mailto:sales@zyvor.dev).
+**Zyvor Enterprise** adds what production teams ask for: supported releases, deployment and upgrade guidance, priority incident triage, a named technical contact and 24x7 critical intake. Production support, SLAs, and Zyvor Enterprise products are licensed separately. Plans and terms: [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md) · [Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=device-agent&utm_campaign=readme_license) · [sales@zyvor.dev](mailto:sales@zyvor.dev). Support from USD 8-18 per device per year (INR 793-1,784 incl. GST in India), USD 5,000 (INR 495,600) annual minimum; buy / get a quote at [zyvor.dev/buy](https://zyvor.dev/buy).
 
 Report vulnerabilities per [SECURITY.md](SECURITY.md). Contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
 

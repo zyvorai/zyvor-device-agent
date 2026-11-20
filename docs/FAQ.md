@@ -18,7 +18,9 @@ section.
 
 **What does "Enterprise" mean, then?** Production support, SLAs, and
 Zyvor's other commercial products are licensed separately from this
-open-source agent. Contact sales@zyvor.dev or see zyvor.dev if you need
+open-source agent. Prices (per device per year, India in INR incl. GST)
+are in [SUBSCRIPTION-MODEL.md](SUBSCRIPTION-MODEL.md#pricing); buy at
+https://zyvor.dev/buy or contact sales@zyvor.dev if you need
 that; nothing in this repository requires it.
 
 ## Support
