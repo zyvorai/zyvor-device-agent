@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 //! API auth. `mode = "none"` (default, backward compatible) enforces nothing. `mode =
 //! "bearer"` requires `Authorization: Bearer <token>` on every `/api/*` route and on

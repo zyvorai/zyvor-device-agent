@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 //
 // vitest's default "node" test environment has no `window`/`localStorage`.
 // The dashboard only ever runs in a real browser (both exist there), so this

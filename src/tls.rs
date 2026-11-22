@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 //! `server.tls.enabled`: native TLS for the daemon's own TCP listener — not
 //! a reverse-proxy config, and independent of `auth.mode` (unlike

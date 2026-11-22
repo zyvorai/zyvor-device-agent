@@ -90,7 +90,7 @@ boundary, repository map and license — see the
 
 ## Is this for you?
 
-Device Agent is a small, single-purpose, source-available (Zyvor Production License v1.0) hardware
+Device Agent is a small, single-purpose, source-available (Zyvor Production Licence v2.0) hardware
 layer for a Linux edge gateway: hardware inventory, health, and bounded
 sensor/bus access. No cloud dependency is required, and Nodra/Fleet integration
 is optional. Industrial protocol decoding and fleet/OTA orchestration are

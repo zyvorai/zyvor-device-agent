@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 """Lab-only enrollment CA for Device Agent CSR protocol.
 
 Fleet must run the production CA. This fixture signs CSRs for local tests and

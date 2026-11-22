@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 //! `auth.mode = "mtls"`: the TCP listener terminates TLS itself using the
 //! identity written by `zyvor-device-agent enroll` (see [`super::enroll`]),

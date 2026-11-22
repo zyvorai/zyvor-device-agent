@@ -1,5 +1,5 @@
 // Copyright 2026 Zyvor AI Labs · https://zyvor.dev
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -184,7 +184,7 @@ function App() {
     <aside className="sidebar">
       <div className="brand"><div className="brand-mark">Z</div><div><strong>Device Agent</strong><span>Zyvor Edge</span></div></div>
       <nav>{pages.map(([name, icon]) => <button key={name} className={page === name ? 'active' : ''} onClick={() => setPage(name)}>{icon}<span>{name}</span></button>)}</nav>
-      <div className="side-foot"><StatusPill ok={live && streamLive}>{authRequired ? 'Authentication required' : live ? (streamLive ? 'Live device' : 'API live') : 'Preview mode'}</StatusPill><span>v{status.version} · Zyvor Production License</span></div>
+      <div className="side-foot"><StatusPill ok={live && streamLive}>{authRequired ? 'Authentication required' : live ? (streamLive ? 'Live device' : 'API live') : 'Preview mode'}</StatusPill><span>v{status.version} · Zyvor Production Licence</span></div>
     </aside>
 
     <main>

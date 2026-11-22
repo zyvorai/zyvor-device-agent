@@ -1,6 +1,6 @@
 # Zyvor Device Agent: support subscriptions
 
-Zyvor Device Agent is source-available software. Free for evaluation, development, testing, research, education and other non-production use under the Zyvor Production License v1.0; any production use requires a paid commercial license ([pricing](https://zyvor.dev/pricing), sales@zyvor.dev). A 30-day trial key is available at [zyvor.dev/trial/start](https://zyvor.dev/trial/start).
+Zyvor Device Agent is source-available software. A 30-day trial is available on request from sales@zyvor.dev (a paid evaluation Order at no charge); production and any other use needs a paid Order under the Zyvor Production Licence v2.0.
 
 Teams that want supported releases and defined response targets can buy an annual **support subscription** from Zyvor.
 
@@ -19,13 +19,13 @@ Prices are in the [Pricing](#pricing) section below; custom pricing: contact [sa
 - Annual prepaid subscription is the default, with a 12-month minimum. Multi-year prepay is available.
 - Minimums apply after any discounts.
 - Implementation, migration, training and managed operations are separate services.
-- At expiry, updates, downloads and support end. Rights under the Zyvor Production License v1.0 continue as stated in that license.
+- At expiry, updates, downloads and support end. Rights under the Zyvor Production Licence v2.0 continue as stated in that license.
 - Response targets need a contracted scope and are not uptime guarantees.
 - Existing signed agreements keep their agreed terms.
 
 ## Pricing
 
-The support subscription is priced per device per year, on one ladder shared by Fleet, Relay, Device Agent, OTA and Nodra, with an annual minimum of USD 5,000 (INR 495,600 incl. GST in India) that applies to every step. Production use requires a commercial license; non-production use is free under the Zyvor Production License v1.0.
+The support subscription is priced per device per year, on one ladder shared by Fleet, Relay, Device Agent, OTA and Nodra, with an annual minimum of USD 5,000 (INR 495,600 incl. GST in India) that applies to every step. Production use needs a paid Order under the Zyvor Production Licence v2.0.
 
 | Devices | Elsewhere (USD, excl. tax) | India (INR, incl. 18% GST) |
 |---|---|---|

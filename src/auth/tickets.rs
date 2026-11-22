@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 //! Short-lived stream tickets for browser surfaces that cannot set
 //! `Authorization` (`<img>` camera URLs). SSE itself uses `fetch()` with the

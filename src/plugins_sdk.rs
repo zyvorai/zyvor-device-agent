@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 //! Plugin SDK v2 checks. Native execution stays in `plugins`. This module
 //! validates the manifest contract and, when built with `--features wasm`,
