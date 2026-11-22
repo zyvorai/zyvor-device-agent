@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 # Emulator-backed failure demonstrations. These are not Minew certification.
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)

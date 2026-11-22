@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 //! One-click support bundle. Secrets, addresses, and hostnames are redacted
 //! before anything is archived. The manifest can be previewed without writing

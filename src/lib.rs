@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 //! Library crate backing the `zyvor-device-agent` binary (`src/main.rs`), split out so
 //! `tests/` can build the real `Router` and drive it end-to-end via

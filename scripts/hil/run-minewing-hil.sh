@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 # Minewing GW1 r1 HIL runner for Zyvor Device Agent.
 #
 #   DA_HIL_BASE=http://127.0.0.1:9188 DA_HIL_ENV=physical|lab-surrogate|qemu \

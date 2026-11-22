@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 
 //! Inference provider contract. Device Agent supervises providers and publishes
 //! status. It does not download models, run them, or remediate from them.

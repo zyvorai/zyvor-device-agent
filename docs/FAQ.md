@@ -10,10 +10,8 @@ decided to adopt it. If you're already building with it, the
 
 ## Licensing & cost
 
-**Do I need a license?** For production use, yes. The daemon, dashboard, and everything in this
-repository are under the Zyvor Production License v1.0; evaluation, development, testing,
-research, education and other non-production use is free, and production use requires a
-paid commercial license from Zyvor AI Labs (sales@zyvor.dev, https://zyvor.dev/pricing).
+**Do I need a license?** Production use needs a paid Order. The daemon, dashboard, and everything in this
+repository are under the Zyvor Production Licence v2.0. A 30-day trial is available on request from sales@zyvor.dev (a paid evaluation Order at no charge); production and any other use needs a paid Order (https://zyvor.dev/pricing).
 Notices must be preserved
 (see [`NOTICE`](https://github.com/zyvorai/device-agent/blob/main/NOTICE)). See the README's [License](https://github.com/zyvorai/device-agent#license)
 section.

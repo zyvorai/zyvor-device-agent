@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+# SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 # CI substitute for Minewing physical HIL when the lab has no board.
 #
 # Starts Device Agent with vcan + minewing profile label, runs the HIL

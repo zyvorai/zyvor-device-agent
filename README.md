@@ -5,7 +5,7 @@
 # Zyvor Device Agent
 
 <a href="https://github.com/zyvorai/zyvor-device-agent/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/zyvorai/zyvor-device-agent/ci.yml?branch=main&label=CI&logo=github" alt="CI status"></a>
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-Zyvor_Production_1.0-blue.svg" alt="License: Zyvor Production License v1.0"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-Zyvor_Production_1.0-blue.svg" alt="License: Zyvor Production Licence v2.0"></a>
 <img src="https://img.shields.io/badge/rust-1.85%2B-orange?logo=rust" alt="Rust 1.85+">
 <img src="https://img.shields.io/badge/platform-arm64%20%7C%20amd64-informational" alt="Platforms: arm64 | amd64">
 <img src="https://img.shields.io/badge/status-v0.2.0%20passport--and--flight--recorder-yellow" alt="Status: v0.2.0 passport and flight recorder">
@@ -64,7 +64,7 @@ It intentionally does **not** interpret Modbus registers, CAN/J1939 PGNs or OPC-
 
 ### Is this for you?
 
-Device Agent is a small, single-purpose, source-available (Zyvor Production License v1.0) hardware
+Device Agent is a small, single-purpose, source-available (Zyvor Production Licence v2.0) hardware
 layer for a Linux edge gateway. It is not a home-automation hub, not a
 container fleet/OTA platform, and not tied to any one cloud vendor. It is a
 lightweight, protocol-agnostic hardware/health layer that hands industrial
@@ -575,11 +575,11 @@ Production and qualification detail: [PRODUCTION.md](docs/PRODUCTION.md) · [HIL
 
 ## Support
 
-Free for a 30-day evaluation (development, testing, research, education) under the Zyvor Production License v1.0; any production use requires a paid commercial license ([pricing](https://zyvor.dev/pricing), sales@zyvor.dev). A 30-day trial key is available at [zyvor.dev/trial/start](https://zyvor.dev/trial/start). If it helps you, you can donate any amount you like: <https://rzp.io/rzp/utwdYh3>. A donation is voluntary and supports development and maintenance. It is not a purchase: it buys no support, SLA, features, priority or license, and it is not tax-deductible (Zyvor AI Labs Private Limited is a company, not a charity). Support contracts are separate: [sales@zyvor.dev](mailto:sales@zyvor.dev).
+A 30-day trial is available on request from sales@zyvor.dev (a paid evaluation Order at no charge); production and any other use needs a paid Order under the Zyvor Production Licence v2.0. If it helps you, you can donate any amount you like: <https://rzp.io/rzp/utwdYh3>. A donation is voluntary and supports development and maintenance. It is not a purchase: it buys no support, SLA, features, priority or license, and it is not tax-deductible (Zyvor AI Labs Private Limited is a company, not a charity). Support contracts are separate: [sales@zyvor.dev](mailto:sales@zyvor.dev).
 
 ## License
 
-Zyvor Device Agent is source-available under the **[Zyvor Production License v1.0](LICENSE)** (SPDX `LicenseRef-Zyvor-Production-1.0`, also in [LICENSES/](LICENSES/LicenseRef-Zyvor-Production-1.0.txt); see [NOTICE](NOTICE)). Evaluation (evaluation, development, testing, research, education) is free for 30 days per organization. Production use requires a commercial license from Zyvor AI Labs Private Limited ([sales@zyvor.dev](mailto:sales@zyvor.dev), [zyvor.dev/buy](https://zyvor.dev/buy)); a 30-day trial key is available for production evaluation.
+Zyvor Device Agent is source-available under the **[Zyvor Production Licence v2.0](LICENSE)** (SPDX `LicenseRef-Zyvor-Production-2.0`, also in [LICENSES/](LICENSES/LicenseRef-Zyvor-Production-2.0.txt); see [NOTICE](NOTICE)). A 30-day trial is available on request from sales@zyvor.dev (a paid evaluation Order at no charge); production and any other use needs a paid Order under the Zyvor Production Licence v2.0 ([sales@zyvor.dev](mailto:sales@zyvor.dev), [zyvor.dev/buy](https://zyvor.dev/buy)).
 
 **Zyvor Enterprise** adds what production teams ask for: supported releases, deployment and upgrade guidance, priority incident triage, a named technical contact and 24x7 critical intake. Production support, SLAs, and Zyvor Enterprise products are licensed separately. Plans and terms: [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md) · [Pricing](https://zyvor.dev/pricing?utm_source=github&utm_medium=device-agent&utm_campaign=readme_license) · [sales@zyvor.dev](mailto:sales@zyvor.dev). Support from USD 8-18 per device per year (INR 793-1,784 incl. GST in India), USD 5,000 (INR 495,600) annual minimum; buy / get a quote at [zyvor.dev/buy](https://zyvor.dev/buy). Orders of USD 5,000 or more and quotes are invoiced in USD through Skydo.
 

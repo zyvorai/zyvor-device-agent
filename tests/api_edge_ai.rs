@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LicenseRef-Zyvor-Production-1.0
+// SPDX-License-Identifier: LicenseRef-Zyvor-Production-2.0
 //
 // HTTP-level coverage for the edge-ai scaffold route. Requires
 // `--features edge-ai` (same pattern as optional-feature CI legs).
